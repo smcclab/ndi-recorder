@@ -1,7 +1,7 @@
 "use strict";
 
 const $ = (sel, el = document) => el.querySelector(sel);
-// Rough bitrate of a full-bandwidth NDI 1080p30 camera (SpeedHQ), measured on a Maki Live.
+// Rough SpeedHQ file bitrate written by the NDI recorder for one 1080p30 Maki Live (HX2 transcoded).
 const EST_CAMERA_BPS = 107e6 / 8;
 const EST_PROXY_BPS = 14e6 / 8;
 

@@ -21,9 +21,13 @@ a trusted network.
 
 ## How recording works
 
-* Each camera is recorded by NDI's own recorder process. It writes the camera's
-  compressed NDI stream straight into a `.mov` — **no re-encoding**, so CPU stays low
-  and quality is exactly what the camera sent.
+* Each camera is recorded by NDI's own recorder process (from NDI Tools), writing a
+  SpeedHQ `.mov`.
+* **This is a transcode for HX cameras.** The Maki Lives send NDI|HX2 (H.264,
+  ~10 Mbit/s on the wire). The free NDI runtime always decodes HX, so the recorder
+  re-encodes it to SpeedHQ (~107 Mbit/s): ~10× the disk use of the original stream,
+  extra CPU, and one generation of (high-quality) re-encoding. Recording the H.264
+  as-is needs the NDI Advanced SDK — see [HX passthrough](#hx-passthrough-not-yet).
 * All recorders connect first (`-noautostart`), then `<start/>` is sent to all at
   once. Every file carries the camera's NDI timecode; in testing all three Maki
   Lives started on the identical timecode.
@@ -37,13 +41,14 @@ a trusted network.
 
 | File | What it is |
 |---|---|
-| `Cam A.mov` | Full-quality video (SpeedHQ, 1080p30 from the Maki Live) + 48 kHz float audio |
+| `Cam A.mov` | Video transcoded to SpeedHQ (1080p30 for the Maki Live) + 48 kHz float audio |
 | `Cam A.mov.preview` | Low-res proxy (turn off in Settings) |
 | `*.ndi` | NDI sidecar index files — keep them next to the .mov |
 
-**Data rate:** the Maki Lives send full-bandwidth NDI at ~107 Mbit/s, i.e. **~48 GB
-per camera per hour, ~145 GB/hour for three** (~42 MB/s sustained). Fine for a USB 3
-HDD or SSD. Avoid FAT32-formatted drives (4 GB file limit) — the app warns about it.
+**Data rate:** the SpeedHQ files are ~107 Mbit/s, i.e. **~48 GB per camera per
+hour, ~145 GB/hour for three** (~42 MB/s sustained), even though the cameras only
+send ~10 Mbit/s each. Fine for a USB 3 HDD or SSD. Avoid FAT32-formatted drives
+(4 GB file limit) — the app warns about it.
 
 **Editing:** SpeedHQ plays in NDI Tools and ffmpeg/VLC. For editors without NDI
 codec support, transcode, e.g.
@@ -51,6 +56,16 @@ codec support, transcode, e.g.
 ```sh
 ffmpeg -i "Cam A.mov" -c:v prores_ks -profile:v 1 -c:a pcm_s16le "Cam A ProRes.mov"
 ```
+
+## HX passthrough (not yet)
+
+Writing the camera's H.264 straight to disk is possible, but only with the
+**NDI Advanced SDK**: its receiver can be asked for compressed frames
+(`NDIlib_recv_color_format_compressed_v3`+), which could be muxed into a `.mov`
+with no re-encode. The standard runtime in NDI Tools (`libndi.dylib`) doesn't offer
+this. The Advanced SDK is free to develop with, but commercial use needs a vendor
+ID from NDI (licensing@ndi.video), and H.264/AAC patent licensing is the
+developer's responsibility. Not implemented yet.
 
 ## Zoom
 
