@@ -1,0 +1,17 @@
+[project]
+name = "ndi-recorder"
+version = "0.1.0"
+description = "Discover NDI cameras on the local network and record them all to separate files."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pillow>=10",
+]
+
+[project.scripts]
+ndi-recorder = "ndi_recorder.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

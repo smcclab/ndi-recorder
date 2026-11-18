@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NDI Recorder</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="dot" id="rec-dot"></span>
+      <h1>NDI Recorder</h1>
+    </div>
+    <div class="transport">
+      <input id="take-name" placeholder="Take name (optional)" maxlength="80">
+      <div class="timer" id="timer">00:00:00</div>
+      <button id="rec-btn" class="rec">● Record all</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section class="panel storage" id="storage">
+    <div class="storage-main">
+      <div class="label">Save recordings to</div>
+      <div class="path" id="folder-path">No folder chosen</div>
+      <div class="meta" id="folder-meta"></div>
+      <ul class="warnings" id="folder-warnings"></ul>
+    </div>
+    <div class="storage-actions">
+      <button id="choose-btn">Choose folder…</button>
+      <button id="browse-btn" class="ghost">Browse drives</button>
+    </div>
+    <div class="space">
+      <div class="bar"><div id="space-bar"></div></div>
+      <div class="space-text" id="space-text"></div>
+    </div>
+  </section>
+
+  <section class="panel session" id="session" hidden>
+    <div><span class="label">Session</span> <span id="session-dir" class="mono"></span></div>
+    <div class="session-stats" id="session-stats"></div>
+    <button id="reveal-btn" class="ghost small">Show in Finder</button>
+  </section>
+
+  <main id="cameras" class="grid"></main>
+  <p id="empty" class="empty" hidden>Searching for NDI sources on the network…</p>
+
+  <details class="panel settings">
+    <summary>Settings</summary>
+    <label class="row">
+      <input type="checkbox" id="opt-previews"> Live previews (low-bandwidth, doesn't affect recordings)
+    </label>
+    <label class="row">
+      <input type="checkbox" id="opt-proxy"> Also write NDI low-res proxy files (<span class="mono">.preview</span>)
+    </label>
+    <label class="row col">
+      Extra camera IPs (comma-separated) — only needed if cameras aren't discovered automatically
+      <input id="opt-extra-ips" placeholder="192.168.0.102, 192.168.0.103">
+    </label>
+    <div class="row" id="hidden-list"></div>
+    <div class="row muted mono" id="recorder-path"></div>
+  </details>
+
+  <dialog id="browser">
+    <form method="dialog">
+      <h2>Choose a recording folder</h2>
+      <div class="volumes" id="volumes"></div>
+      <div class="crumbs mono" id="crumbs"></div>
+      <ul class="dirs" id="dirs"></ul>
+      <div class="dialog-actions">
+        <button type="button" id="mkdir-btn" class="ghost">New folder…</button>
+        <span class="spacer"></span>
+        <button value="cancel" class="ghost">Cancel</button>
+        <button type="button" id="use-dir-btn">Use this folder</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="cam-tpl">
+    <article class="cam">
+      <div class="preview">
+        <img alt="">
+        <div class="no-preview">No preview</div>
+        <div class="rec-badge" hidden>REC</div>
+        <div class="vu"><div></div></div>
+      </div>
+      <div class="cam-body">
+        <div class="cam-head">
+          <input class="cam-label" placeholder="Label (used as file name)">
+          <label class="include" title="Include in recording"><input type="checkbox" class="cam-selected"> Record</label>
+        </div>
+        <div class="cam-name mono"></div>
+        <div class="cam-meta"></div>
+        <div class="zoom">
+          <button class="zoom-out" title="Hold to zoom out">− Wide</button>
+          <input type="range" class="zoom-speed" min="0.1" max="1" step="0.05" value="0.5" title="Zoom speed">
+          <button class="zoom-in" title="Hold to zoom in">Tele +</button>
+        </div>
+        <div class="presets">
+          <span class="muted">Presets</span>
+          <button data-n="0">1</button><button data-n="1">2</button><button data-n="2">3</button><button data-n="3">4</button>
+          <label class="store muted"><input type="checkbox" class="store-mode"> save</label>
+        </div>
+        <div class="cam-rec"></div>
+        <div class="cam-foot">
+          <a class="cam-web" target="_blank" rel="noopener">Camera web page ↗</a>
+          <button class="hide-btn link">Hide</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
